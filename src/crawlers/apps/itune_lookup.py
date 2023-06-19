@@ -8,3 +8,6 @@ class ITunesAppsLookupCrawler(GenericCrawler):
 
     def set_url_to_crawl_app_by_company_name(self, company_name: str):
         self.url += f"&attribute=softwareDeveloper&term={company_name}"
+        self.extractor.update_context(company_name=company_name)
+        self.transformer.update_context(company_name=company_name)
+        self.loader.update_context(company_name=company_name)
