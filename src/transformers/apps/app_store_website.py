@@ -3,7 +3,7 @@ from typing import Any
 from src.transformers.abstract import AbstractTransformer
 
 
-class ITunesAppsTransformer(AbstractTransformer):
+class AppStoreAppsWebsiteTransformer(AbstractTransformer):
     def __init__(self, context: dict = None):
         self.context = context or {}
 
