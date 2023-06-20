@@ -27,5 +27,22 @@ def crawl_company_apps(company_name: str):
 
 
 if __name__ == "__main__":
-    # args = sys.argv[1]
-    crawl_company_apps("netflix")
+    company_name = sys.argv[1]
+    data = crawl_company_apps(company_name)
+    logging.info(f"Done. Found {len(data)} apps.")
+
+    # Print details information
+    group_data_by_artist_id = {}
+    for app in data:
+        key = (app.artist_id, app.artist_name)
+        if key not in group_data_by_artist_id:
+            group_data_by_artist_id[key] = []
+        group_data_by_artist_id[key].append(app)
+    for artist_id, artist_name in group_data_by_artist_id:
+        logging.info(
+            "Artist: {}: {} apps. Verify here: {}".format(
+                artist_name,
+                len(group_data_by_artist_id[(artist_id, artist_name)]),
+                f"https://apps.apple.com/us/developer/{artist_id}",
+            )
+        )

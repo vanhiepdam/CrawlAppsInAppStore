@@ -14,13 +14,17 @@ from src.utils.selenium import SeleniumUtil
 
 
 class AppStoreAppsWebsiteExtractor(AbstractExtractor):
-    LIMIT_PER_REQUEST = 200
-    LIMIT_DEVELOPER_MATCH = 5
+    def __init__(
+        self, context: dict = None, limit_per_request: int = 200, limit_developer_match: int = 5
+    ):
+        super().__init__(context)
+        self.limit_per_request = limit_per_request
+        self.limit_developer_match = limit_developer_match
 
     def _get_developers_data_from_website(self) -> dict:
         url = "https://itunes.apple.com/search?media=software&entity=allArtist&attribute=softwareDeveloper&term={}&limit={}".format(
             self.context["company_name"],
-            self.LIMIT_DEVELOPER_MATCH,
+            self.limit_per_request,
         )
         response = requests.get(url)
         response.raise_for_status()
@@ -29,7 +33,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
 
     def _get_developers_by_search_name(self) -> dict[str, str]:
         data = self._get_developers_data_from_website()
-        if data["resultCount"] > self.LIMIT_DEVELOPER_MATCH:
+        if data["resultCount"] > self.limit_developer_match:
             raise ValueError("Too many results. Please search for more specific name.")
 
         developers = {
@@ -94,7 +98,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
         return data["results"]
 
     def _get_apps_info_from_app_ids(self, app_ids: list[str]) -> list[dict]:
-        id_chunks = ListUtil.split_array_into_chunks(app_ids, self.LIMIT_PER_REQUEST)
+        id_chunks = ListUtil.split_array_into_chunks(app_ids, self.limit_per_request)
         apps_info = []
         for id_chunk in id_chunks:
             data = self._look_up_app_info_from_app_ids(id_chunk)

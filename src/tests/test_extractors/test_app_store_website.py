@@ -35,11 +35,12 @@ class TestAppStoreWebsiteExtractor:
     @mock.patch(
         "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
     )
-    @mock.patch.object(AppStoreAppsWebsiteExtractor, "LIMIT_DEVELOPER_MATCH", 1)
     def test_extract__too_many_developer(self, _get_developers_data_from_website):
         # Arrange
         url = "https://apps.apple.com/us/developer/netflix-inc/id363590051"
-        extractor = AppStoreAppsWebsiteExtractor(context={"company_name": "netflix"})
+        extractor = AppStoreAppsWebsiteExtractor(
+            context={"company_name": "netflix"}, limit_developer_match=1
+        )
         _get_developers_data_from_website.return_value = {
             "resultCount": 2,
             "results": [],
@@ -123,7 +124,7 @@ class TestAppStoreWebsiteExtractor:
                         "artistId": 1691287718,
                     },
                 ],
-            }
+            },
         )
         mocker.patch(
             "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._look_up_app_info_from_app_ids",
