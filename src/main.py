@@ -30,8 +30,8 @@ def crawl_company_apps(company_name: str):
 
 
 if __name__ == "__main__":
-    # company_name = sys.argv[1]
-    data = crawl_company_apps("netflix")
+    company_name = sys.argv[1]
+    data = crawl_company_apps(company_name)
     logging.info(f"Done. Found {len(data)} apps.")
 
     # Print details information
