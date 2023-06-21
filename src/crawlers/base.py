@@ -1,8 +1,8 @@
 from abc import ABC
 
-from src.extractors.abstract import AbstractExtractor
-from src.loaders.abstract import AbstractLoader
-from src.transformers.abstract import AbstractTransformer
+from extractors.abstract import AbstractExtractor
+from loaders.abstract import AbstractLoader
+from transformers.abstract import AbstractTransformer
 
 
 class GenericCrawler(ABC):

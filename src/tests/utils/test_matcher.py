@@ -1,4 +1,4 @@
-from src.utils.matcher import MatcherUtil
+from utils.matcher import MatcherUtil
 import pytest
 
 
@@ -10,9 +10,14 @@ class TestMatcherUtil:
             ("netflix", "Netflix, Inc."),
             ("Netflix", "Netflix"),
             ("Netflix", "Netflix, Inc."),
+            ("Netflix, Inc.", "Netflix, Inc."),
             ("Netflix", "netflix"),
             ("Netflix", "netflix, Inc."),
             ("netflix", "Netflix +"),
+            ("netflix inc", "Netflix, Inc."),
+            ("netflix inc.", "Netflix, Inc."),
+            ("netflix, inc", "Netflix, Inc."),
+            ("netflix. inc,", "Netflix, Inc."),
         ]
     )
     def test_is_company_name_match_developer_name__match(self, company_name, developer_name):

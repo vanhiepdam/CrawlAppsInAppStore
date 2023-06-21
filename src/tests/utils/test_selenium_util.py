@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from src.utils.selenium import SeleniumUtil
+from utils.selenium import SeleniumUtil
 
 
 class TestSeleniumUtil:

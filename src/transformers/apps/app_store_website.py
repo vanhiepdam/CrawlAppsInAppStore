@@ -1,5 +1,5 @@
-from src.data.apps import AppsData
-from src.transformers.abstract import AbstractTransformer
+from data.apps import AppsData
+from transformers.abstract import AbstractTransformer
 
 
 class AppStoreAppsWebsiteTransformer(AbstractTransformer):

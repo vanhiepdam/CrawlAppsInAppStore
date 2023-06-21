@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.loaders.abstract import AbstractLoader
+from loaders.abstract import AbstractLoader
 
 
 class DummyLoader(AbstractLoader):

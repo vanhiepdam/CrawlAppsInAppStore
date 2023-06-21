@@ -1,4 +1,4 @@
-from src.crawlers.base import GenericCrawler
+from crawlers.base import GenericCrawler
 
 
 class AppStoreAppsCrawler(GenericCrawler):

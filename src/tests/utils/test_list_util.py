@@ -1,4 +1,4 @@
-from src.utils.list import ListUtil
+from utils.list import ListUtil
 
 
 class TestPythonUtil:

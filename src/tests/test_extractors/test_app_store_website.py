@@ -3,19 +3,13 @@ from unittest import mock
 
 import pytest
 
-from src.extractors.apps.app_store_website import AppStoreAppsWebsiteExtractor
-from src.tests.test_extractors.data.app_store.apps_info import app_info_sample
-
-
-def _get_website_content_from_url_side_effect(self, driver, url):
-    current_folder_of_this_file = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_folder_of_this_file, "data/app_store/developer_homepage.html")
-    driver.get(f"file://{file_path}")
+from extractors.apps.app_store_website import AppStoreAppsWebsiteExtractor
+from tests.data.app_store.apps_info import app_info_sample
 
 
 class TestAppStoreWebsiteExtractor:
     @mock.patch(
-        "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
+        "extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
     )
     def test_extract__no_developer(self, _get_developers_data_from_website):
         # Arrange
@@ -33,7 +27,7 @@ class TestAppStoreWebsiteExtractor:
         assert result == []
 
     @mock.patch(
-        "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
+        "extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
     )
     def test_extract__too_many_developer(self, _get_developers_data_from_website):
         # Arrange
@@ -54,7 +48,7 @@ class TestAppStoreWebsiteExtractor:
         assert str(ex.value) == "Too many results. Please search for more specific name."
 
     @mock.patch(
-        "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
+        "extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
     )
     def test__get_developers_by_search_name(self, _get_developers_data_from_website):
         # Arrange
@@ -105,7 +99,7 @@ class TestAppStoreWebsiteExtractor:
 
         # Mock data
         mocker.patch(
-            "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
+            "extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_developers_data_from_website",
             return_value={
                 "resultCount": 2,
                 "results": [
@@ -127,11 +121,20 @@ class TestAppStoreWebsiteExtractor:
             },
         )
         mocker.patch(
-            "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._look_up_app_info_from_app_ids",
+            "extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._look_up_app_info_from_app_ids",
             return_value=app_info_sample["results"],
         )
+
+        def _get_website_content_from_url_side_effect(self, driver, url):
+            current_folder_of_this_file = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(
+                os.path.dirname(current_folder_of_this_file),
+                "data/app_store/developer_homepage.html",
+            )
+            driver.get(f"file://{file_path}")
+
         mocker.patch(
-            "src.extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_website_content_from_url",
+            "extractors.apps.app_store_website.AppStoreAppsWebsiteExtractor._get_website_content_from_url",
             _get_website_content_from_url_side_effect,
         )
 

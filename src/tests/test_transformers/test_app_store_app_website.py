@@ -1,6 +1,6 @@
 import pytest
 
-from src.transformers.apps.app_store_website import AppStoreAppsWebsiteTransformer
+from transformers.apps.app_store_website import AppStoreAppsWebsiteTransformer
 
 
 class TestAppStoreAppsWebsiteTransformer:

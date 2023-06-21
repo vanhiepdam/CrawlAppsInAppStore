@@ -7,10 +7,10 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
-from src.extractors.abstract import AbstractExtractor
-from src.utils.matcher import MatcherUtil
-from src.utils.list import ListUtil
-from src.utils.selenium import SeleniumUtil
+from extractors.abstract import AbstractExtractor
+from utils.matcher import MatcherUtil
+from utils.list import ListUtil
+from utils.selenium import SeleniumUtil
 
 
 class AppStoreAppsWebsiteExtractor(AbstractExtractor):
