@@ -30,14 +30,14 @@ def crawl_company_apps(company_name: str):
 
 
 if __name__ == "__main__":
-    company_name = sys.argv[1]
-    data = crawl_company_apps(company_name)
+    # company_name = sys.argv[1]
+    data = crawl_company_apps("netflix")
     logging.info(f"Done. Found {len(data)} apps.")
 
     # Print details information
     group_data_by_artist_id = {}
     for app in data:
-        key = (app.artist_id, app.artist_name)
+        key = (app["artist_id"], app["artist_name"])
         if key not in group_data_by_artist_id:
             group_data_by_artist_id[key] = []
         group_data_by_artist_id[key].append(app)
