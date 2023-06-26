@@ -1,8 +1,11 @@
 import os
 
+import pytest
 from fastapi.testclient import TestClient
+
 from api.main import app
 from tests.data.app_store.apps_info import app_info_sample
+from transformers.apps.app_store_website import AppStoreAppsWebsiteTransformer
 
 client = TestClient(app)
 
@@ -64,7 +67,11 @@ class TestCrawlsApi:
         assert len(netflix_app_result) == 1
         assert netflix_app_result[0]["app_name"] == sample_netflix_app["trackName"]
         assert netflix_app_result[0]["app_url"] == sample_netflix_app["trackViewUrl"]
-        assert netflix_app_result[0]["app_targets"] == sample_netflix_app["supportedDevices"]
+        assert netflix_app_result[0][
+            "app_targets"
+        ] == AppStoreAppsWebsiteTransformer.get_supported_devices(
+            sample_netflix_app["supportedDevices"]
+        )
 
         # Assert 2nd app
         sample_too_hot_to_handle_app = app_info_sample["results"][1]
@@ -79,11 +86,13 @@ class TestCrawlsApi:
             too_hot_to_handle_app_result[0]["app_url"]
             == sample_too_hot_to_handle_app["trackViewUrl"]
         )
-        assert (
-            too_hot_to_handle_app_result[0]["app_targets"]
-            == sample_too_hot_to_handle_app["supportedDevices"]
+        assert too_hot_to_handle_app_result[0][
+            "app_targets"
+        ] == AppStoreAppsWebsiteTransformer.get_supported_devices(
+            sample_too_hot_to_handle_app["supportedDevices"]
         )
 
+    @pytest.mark.integration
     def test_success__crawl_by_company_name__with_network(self):
         # Act
         response = client.post(
