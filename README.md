@@ -23,6 +23,8 @@ And the application must define the definition of how to get the company name fr
 1. itunes api does not allow to fetch more than 200 items per request and has no way to paginate the data
 2. Cannot fetch enough information directly from app store websites only. So I have to combine the data from itunes api and app store websites
 
+## Check it out
+
 ## Technologies
 - [python-3.10](https://www.python.org/) for building backend application
 - [Selenium](https://www.selenium.dev/) for crawling data
@@ -84,3 +86,4 @@ For example after running successfully, the application will print out the resul
 ## Improvements
 To make this application in a good shape, I would improve all the limitations and also add more feature to the application:
 1. Allow user to select company name from the list of companies that match the given name
+2. By right, the api should be separated into 2 apis. 1 for crawling data which will be done by a background job, and 1 for getting the result. So that the user can check the result later

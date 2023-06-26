@@ -1,12 +1,13 @@
 import os
 
-import pytest
-
-from main import crawl_company_apps
+from fastapi.testclient import TestClient
+from api.main import app
 from tests.data.app_store.apps_info import app_info_sample
 
+client = TestClient(app)
 
-class TestCrawlAppsInAppStore:
+
+class TestCrawlsApi:
     def test_success__crawl_by_company_name__without_network(self, mocker):
         # Mock data
         mocker.patch(
@@ -43,27 +44,32 @@ class TestCrawlAppsInAppStore:
         )
 
         # Act
-        apps_info = crawl_company_apps("netflix, inc.")
+        response = client.post(
+            "/api/v1/crawl",
+            json={
+                "company_name": "netflix, inc.",
+            },
+        )
 
         # Assert
-        assert len(apps_info) == len(app_info_sample["results"])
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == len(app_info_sample["results"])
 
         # Assert 1st app
         sample_netflix_app = app_info_sample["results"][0]
         netflix_app_result = [
-            item for item in apps_info if item["app_id"] == sample_netflix_app["trackId"]
+            item for item in data if item["app_id"] == str(sample_netflix_app["trackId"])
         ]
         assert len(netflix_app_result) == 1
         assert netflix_app_result[0]["app_name"] == sample_netflix_app["trackName"]
         assert netflix_app_result[0]["app_url"] == sample_netflix_app["trackViewUrl"]
         assert netflix_app_result[0]["app_targets"] == sample_netflix_app["supportedDevices"]
-        assert netflix_app_result[0]["artist_name"] == sample_netflix_app["artistName"]
-        assert netflix_app_result[0]["artist_id"] == sample_netflix_app["artistId"]
 
         # Assert 2nd app
         sample_too_hot_to_handle_app = app_info_sample["results"][1]
         too_hot_to_handle_app_result = [
-            item for item in apps_info if item["app_id"] == sample_too_hot_to_handle_app["trackId"]
+            item for item in data if item["app_id"] == str(sample_too_hot_to_handle_app["trackId"])
         ]
         assert len(too_hot_to_handle_app_result) == 1
         assert (
@@ -77,30 +83,24 @@ class TestCrawlAppsInAppStore:
             too_hot_to_handle_app_result[0]["app_targets"]
             == sample_too_hot_to_handle_app["supportedDevices"]
         )
-        assert (
-            too_hot_to_handle_app_result[0]["artist_name"]
-            == sample_too_hot_to_handle_app["artistName"]
-        )
-        assert (
-            too_hot_to_handle_app_result[0]["artist_id"] == sample_too_hot_to_handle_app["artistId"]
-        )
 
-    @pytest.mark.integration
     def test_success__crawl_by_company_name__with_network(self):
         # Act
-        apps_info = crawl_company_apps("netflix, inc.")
+        response = client.post(
+            "/api/v1/crawl",
+            json={
+                "company_name": "netflix, inc.",
+            },
+        )
 
         # Assert
-        assert len(apps_info) > 60
-
+        data = response.json()
+        assert len(data) > 60
         # Assert netflix app in the result
-        netflix_app_result = [item for item in apps_info if item["app_id"] == 363590051]
+        netflix_app_result = [item for item in data if item["app_id"] == "363590051"]
         assert len(netflix_app_result) == 1
         assert netflix_app_result[0]["app_name"] is not None
         assert netflix_app_result[0]["app_name"] != ""
         assert netflix_app_result[0]["app_url"] is not None
         assert netflix_app_result[0]["app_url"] != ""
         assert len(netflix_app_result[0]["app_targets"]) > 0
-        assert netflix_app_result[0]["artist_name"] is not None
-        assert netflix_app_result[0]["artist_name"] != ""
-        assert netflix_app_result[0]["artist_id"] == 363590054
