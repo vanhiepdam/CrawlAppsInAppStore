@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:8000"
+    volumes:
+      - .:/app/
+    command:
+      - /bin/bash
+      - -c
+      - |
+          cd src
+          uvicorn api.main:app --host 0.0.0.0 --port 8000
+    networks:
+      - app_net
+
+networks:
+    app_net:
+        driver: bridge

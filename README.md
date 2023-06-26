@@ -23,7 +23,13 @@ And the application must define the definition of how to get the company name fr
 1. itunes api does not allow to fetch more than 200 items per request and has no way to paginate the data
 2. Cannot fetch enough information directly from app store websites only. So I have to combine the data from itunes api and app store websites
 
-## Check it out
+## Live version: Check it out
+The application has been deployed to AWS EC2. You can check it out at the link below
+```
+http://18.183.204.247:9999/docs#/default/crawl_api_v1_crawl_post
+```
+
+Enter your company name in the `Request body` section and click on `Execute` button. The application will return the result in the `Response body` section
 
 ## Technologies
 - [python-3.10](https://www.python.org/) for building backend application
@@ -34,6 +40,7 @@ And the application must define the definition of how to get the company name fr
 ## Installation on local machine
 ### Prerequisites
 - [Docker](https://www.docker.com/)
+- [Docker compose](https://docs.docker.com/compose/install/)
 - This guidance has been tested on MacOS only
 
 ### Steps
@@ -47,10 +54,25 @@ git clone git@github.com:vanhiepdam/CrawlAppsInAppStore.git
 cd CrawlAppsInAppStore
 ```
 
-3. Build docker image
+3. Create env file
 ```shell
-docker build -t app_store_crawler .
+cp .env.example .env
 ```
+
+Update the env file with your own values if needed 
+
+
+4. Build docker image
+```shell
+docker-compose build
+```
+
+5. Run the application
+```shell
+docker-compose up -d
+```
+The application will be run at 127.0.0.1:8000 by default. You can change the port in the env file
+
 
 ### Run the application
 1. Run unit tests (by default, integration tests will be skipped). After running successfully, the application will print out the coverage report
@@ -65,18 +87,17 @@ docker run app_store_crawler pytest
 docker run app_store_crawler pytest -m integration
 ```
 
-3. Run crawler with company name
-    
-```shell
-docker run app_store_crawler python src/main.py <YOUR_COMPANY_NAME>
+3. Open api doc to simulate the api call. Go to the link below and click on `Try it out` button
+```
+http://127.0.0.1:8000/docs#/default/crawl_api_v1_crawl_post
 ```
 
-For example after running successfully, the application will print out the result like this, you can then go to the links to verify the result for each crawled company
-```shell
-2023-06-21 15:54:54,949 [INFO] Done. Found 69 apps.
-2023-06-21 15:54:54,950 [INFO] Artist: Netflix, Inc.: 68 apps. Verify here: https://apps.apple.com/us/developer/363590054
-2023-06-21 15:54:54,950 [INFO] Artist: DVD.com, A Netflix Company: 1 apps. Verify here: https://apps.apple.com/us/developer/1169772775
-```
+In the `Request body` section, replace the value of `company_name` with your own company name.
+
+For example: ```{ "company_name": "Facebook" }```
+
+Click on `Execute` button and wait. The application will return the result in the `Response body` section
+
 
 ## Limitations
 - The application only supports crawling data with 1 single process and 1 single thread. Web crawling is an I/O intensive task, so better to apply multi thread in order to improve the performance
