@@ -25,6 +25,10 @@ class AppStoreAppsWebsiteTransformer(AbstractTransformer):
                 devices.update([
                     AppDevice.APPLE_WATCH,
                 ])
+            elif device == AppDevice.APPLE_TV:
+                devices.update([
+                    AppDevice.APPLE_TV,
+                ])
         return list(devices)
 
     def transform(self, data: list[dict]) -> list[AppsData]:

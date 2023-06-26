@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
+from constants.app_device import AppDevice
 from extractors.abstract import AbstractExtractor
 from utils.matcher import MatcherUtil
 from utils.list import ListUtil
@@ -20,6 +21,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
         super().__init__(context)
         self.limit_per_request = limit_per_request
         self.limit_developer_match = limit_developer_match
+        self.apple_tv_apps = set()
 
     def _get_developers_data_from_website(self) -> dict:
         url = "https://itunes.apple.com/search?media=software&entity=allArtist&attribute=softwareDeveloper&term={}&limit={}".format(
@@ -76,8 +78,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
                 by=By.XPATH, value=".//a[@class='ember-view link section__nav__see-all-link']"
             )
             if len(see_all_link) > 0:
-                all_app_ids = self._get_apps_from_see_all_url(see_all_link[0].get_attribute("href"))
-                app_ids.update(all_app_ids)
+                sub_app_ids = self._get_apps_from_see_all_url(see_all_link[0].get_attribute("href"))
             else:
                 # find all a tags inside a div with class "l-row l-row--peek" and
                 # get href from those a tags
@@ -87,7 +88,18 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
                 )
                 if len(peek_row) > 0:
                     a_tags = peek_row[0].find_elements(by=By.XPATH, value=".//a")
-                    app_ids.update([a_tag.get_attribute("href").split("/")[-1] for a_tag in a_tags])
+                    sub_app_ids = {a_tag.get_attribute("href").split("/")[-1] for a_tag in a_tags}
+                else:
+                    sub_app_ids = set()
+            app_ids.update(sub_app_ids)
+
+            # Update apple tv apps.
+            # Because there is no apple tv supported devices in itunes api
+            section_title = section.find_element(
+                by=By.XPATH, value=".//h2[@class='section__headline']"
+            ).accessible_name
+            if section_title == "Apple TV":
+                self.apple_tv_apps.update(sub_app_ids)
         return self._clean_app_ids(app_ids)
 
     def _look_up_app_info_from_app_ids(self, app_ids: list[str]) -> list[dict]:
@@ -95,7 +107,17 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        return data["results"]
+        raw_data = data["results"]
+
+        # add apple tv to supported devices if it is in apple tv apps
+        for app in raw_data:
+            if (
+                str(app["trackId"]) in self._clean_app_ids(self.apple_tv_apps)
+            ) or (
+                app["trackId"] in self._clean_app_ids(self.apple_tv_apps)
+            ):
+                app["supportedDevices"].append(AppDevice.APPLE_TV)
+        return raw_data
 
     def _get_apps_info_from_app_ids(self, app_ids: list[str]) -> list[dict]:
         id_chunks = ListUtil.split_array_into_chunks(app_ids, self.limit_per_request)
@@ -112,8 +134,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
     def _get_new_driver_with_url(self, url: str, **kwargs) -> WebDriver:
         option = webdriver.ChromeOptions()
         option.add_argument("--headless")
-        option.add_argument('--no-sandbox')
-        option.add_argument('--disable-dev-shm-usage')
+        option.add_argument("--no-sandbox")
         driver = webdriver.Chrome(
             service=ChromeService(ChromeDriverManager().install()), options=option, **kwargs
         )
