@@ -135,6 +135,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
         option = webdriver.ChromeOptions()
         option.add_argument("--headless")
         option.add_argument("--no-sandbox")
+        option.add_argument('--disable-dev-shm-usage')
         driver = webdriver.Chrome(
             service=ChromeService(ChromeDriverManager().install()), options=option, **kwargs
         )
