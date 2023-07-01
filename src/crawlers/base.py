@@ -1,5 +1,6 @@
 from abc import ABC
 
+from exceptions.base import CrawlException
 from extractors.abstract import AbstractExtractor
 from loaders.abstract import AbstractLoader
 from transformers.abstract import AbstractTransformer
@@ -33,7 +34,7 @@ class GenericCrawler(ABC):
 
     def crawl(self):
         if self.url is None:
-            raise ValueError("URL is not set")
+            raise CrawlException("URL is not set")
         self.extracted_data = self.extractor.extract(self.url)
         self.transformed_data = self.transformer.transform(self.extracted_data)
         self.loader.load(self.transformed_data)

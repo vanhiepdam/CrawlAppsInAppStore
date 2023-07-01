@@ -1,5 +1,6 @@
 from constants.app_device import AppDevice
 from data.apps import AppsData
+from exceptions.base import CrawlException
 from transformers.abstract import AbstractTransformer
 
 
@@ -35,9 +36,9 @@ class AppStoreAppsWebsiteTransformer(AbstractTransformer):
         transformed_data = []
         for app in data:
             if not app.get("trackName"):
-                raise ValueError("Missing trackName")
+                raise CrawlException("Missing trackName")
             if not app.get("trackId"):
-                raise ValueError("Missing trackId")
+                raise CrawlException("Missing trackId")
 
             transformed_data.append(
                 AppsData(

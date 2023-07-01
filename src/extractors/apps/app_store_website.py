@@ -8,9 +8,10 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 from constants.app_device import AppDevice
+from exceptions.base import CrawlException
 from extractors.abstract import AbstractExtractor
-from utils.matcher import MatcherUtil
 from utils.list import ListUtil
+from utils.matcher import MatcherUtil
 from utils.selenium import SeleniumUtil
 
 
@@ -36,7 +37,9 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
     def _get_developers_by_search_name(self) -> dict[str, str]:
         data = self._get_developers_data_from_website()
         if data["resultCount"] > self.limit_developer_match:
-            raise ValueError("Too many results. Please search for more specific name.")
+            raise CrawlException(
+                "Too many companies in the search results. Please search for more specific name."
+            )
 
         developers = {
             item["artistId"]: item["artistName"]
@@ -111,9 +114,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
 
         # add apple tv to supported devices if it is in apple tv apps
         for app in raw_data:
-            if (
-                str(app["trackId"]) in self._clean_app_ids(self.apple_tv_apps)
-            ) or (
+            if (str(app["trackId"]) in self._clean_app_ids(self.apple_tv_apps)) or (
                 app["trackId"] in self._clean_app_ids(self.apple_tv_apps)
             ):
                 app["supportedDevices"].append(AppDevice.APPLE_TV)
@@ -135,7 +136,7 @@ class AppStoreAppsWebsiteExtractor(AbstractExtractor):
         option = webdriver.ChromeOptions()
         option.add_argument("--headless")
         option.add_argument("--no-sandbox")
-        option.add_argument('--disable-dev-shm-usage')
+        option.add_argument("--disable-dev-shm-usage")
         driver = webdriver.Chrome(
             service=ChromeService(ChromeDriverManager().install()), options=option, **kwargs
         )
